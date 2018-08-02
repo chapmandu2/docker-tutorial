@@ -2,7 +2,11 @@
 # Simple start with hello-world
 ####################
 
+# hello world!
 docker run hello-world
+
+# what's going on?  Difference between VM and Container is that Container much more lightweight so smaller and quicker to instatiate
+open https://docs.docker.com/get-started/#containers-and-virtual-machines
 
 ####################
 # Run a container based on a centos image
@@ -12,6 +16,7 @@ docker run hello-world
 docker run -it --name='test_centos' centos
 ls
 hostname
+uname -a
 
 # IN NEW TERMINAL - check on docker process
 docker ps
@@ -79,7 +84,6 @@ exit
 # straight into r by setting entrypoint
 docker run -it --rm --entrypoint R phil-r
 q()
-exit
 
 ### first use case for Docker for R users: running different versions of R!
 
@@ -96,7 +100,7 @@ install.packages('lattice')
 library(lattice)
 
 # Now try xml2
-install.packages('xml2')
+install.packages('xml2', Ncpus=parallel::detectCores())
 
 # fails because we're missing a system dep - install this
 q()
@@ -105,7 +109,7 @@ apt-get install libxml2-dev
 
 # now try again - success!
 R
-install.package('xml2')
+install.packages('xml2', Ncpus=parallel::detectCores())
 library(xml2)
 q()
 exit
@@ -163,11 +167,12 @@ q()
 #########################
 
 # Someone's done this before - look at rocker - different r versions
-https://hub.docker.com/u/rocker/
+open https://hub.docker.com/u/rocker/
 
 # pull down the image and run
 docker pull rocker/r-ver:3.3.1
 docker run --rm -it rocker/r-ver:3.3.1
+sessionInfo()
 rownames(installed.packages())
 q()
 
@@ -175,24 +180,29 @@ q()
 # This is where it gets really cool...
 #####################
 
-docker run -d -p 8787:8787 rocker/rstudio
+docker run -d -p 8787:8787 --name='rstudio-demo' rocker/rstudio
+open http://localhost:8787/
 
-# What is this black magic?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.  
-# The image contains RStudio Server Community Edition so we can run R in here rather than using the terminal.
+# What is this?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.  
+# The image serves RStudio Server Community Edition so we can run RStudio in a browser rather than using R on the terminal.
 
 # Look at the running container
 docker ps
 
 # use docker exec to open a bash session inside the container (as root)
-docker exec -it container-name bash
+docker exec -it rstudio-demo bash
 
-# switch to the rstudio user and go to the home directory
-su rstudio
-cd ~
+# go to the rstudio home directory
+cd /home/rstudio
 
 # then create a file in RStudio
 # and view it in the shell
 ls
+
+# tidy up
+exit
+docker stop rstudio-demo
+docker rm rstudio-demo
 
 ######################
 # Summing up
@@ -211,11 +221,12 @@ ls
 
 # Self-auditing Docker images
 # - see blog post and git repo for details:
-#   - https://chapmandu2.github.io/post/2018/05/26/reproducible-data-science-environments-with-docker/
-# - easier if you start from a rocker image (I needed centos)
+open https://chapmandu2.github.io/post/2018/05/26/reproducible-data-science-environments-with-docker/
+
+# - easier if you start from a rocker image (I needed centos so had to start from scratch)
 # - Makefiles useful as they allow version control of docker build commands
 
-# Show end product ie NLP Docker container (this bit won't)
+# Show end product ie NLP Docker container (this bit won't work from the git repo, sorry)
 docker start rstan-demo
 open http://localhost:8787/ #rstudio
 open http://localhost:3838/users/rstudio/ #shiny
@@ -227,5 +238,3 @@ open http://localhost:3838/users/rstudio/ #shiny
 # - great for analysis and publishing in same environment - since it's a Docker container can host it anywhere...
 
 docker stop rstan-demo
-
-
