@@ -1,0 +1,210 @@
+####################
+# Simple start with hello-world
+####################
+
+docker run hello-world
+
+####################
+# Run a container based on a centos image
+####################
+
+# start the container
+docker run -it --name='test_centos' centos
+ls
+hostname
+
+# IN NEW TERMINAL - check on docker process
+docker ps
+
+# back to container - create a file
+touch phil.txt
+ls
+exit
+
+# container has stopped:
+docker ps
+
+# see with docker ps -a
+docker ps -a
+
+# restart it
+docker start test_centos
+
+# check it
+docker ps
+
+# get back into it with docker exec
+docker exec -it test_centos bash
+
+# check that phil.txt is present
+ls
+
+# then exit, stop and remove the container
+exit
+docker stop test_centos
+docker rm test_centos
+
+######################
+# Make another centos image - a different instance but same container!
+######################
+
+# make the container - use --rm parameter to automatically delete on exit
+docker run -it --rm --name=centos_test2 centos
+
+# is phil.txt there?
+ls
+
+# NO!  This is a new instance remember...
+
+# in Terminal 2 check container is running
+docker ps
+
+# in Terminal 1 exit and check it has been removed
+exit
+docker ps -a
+
+#################
+# Working with R
+#################
+
+# start a container from an image with R installed
+docker run -it --rm phil-r
+R
+q()
+exit
+
+# straight into r by setting entrypoint
+docker run -it --rm --entrypoint R phil-r
+q()
+exit
+
+# Would be nice to have some data:
+docker run -it --rm -v ~/Documents:/localdata phil-r
+ls
+ls localdata
+exit
+
+# Then install a package - lattice
+docker run -it --rm phil-r
+R
+install.package('lattice')
+library(lattice)
+
+# Now try xml2
+install.package('xml2')
+
+# fails because we're missing a system dep
+q()
+apt-get update
+apt-get install libxml2-dev
+R
+install.package('xml2')
+library(xml2)
+
+######################
+# Dockerfiles
+######################
+
+# Dockerfiles let us put in code the instructions for creating an image - reproducible!
+
+# phil-r2
+# change entrypoint to R so we don't have to do it in the docker run command
+cd phil-r2
+docker build . --tag='phil-r2'
+docker run -it --rm phil-r2
+q()
+
+# phil-r3
+# install lattice
+cd ../phil-r3
+docker build . --tag='phil-r3'
+docker run -it --rm phil-r3
+library(lattice)
+q()
+
+# phil-r4
+# install xml2 and its system dependencies
+cd ../phil-r4
+docker build . --tag='phil-r4'
+docker run -it --rm phil-r4
+library(xml2)
+q()
+
+#############
+# Makefiles can be useful to control docker commands
+#############
+
+# see Makefile contents
+more Makefile
+
+# how to use make
+make
+
+# use make run to run the image
+make run
+q()
+
+# use make run-data to run the image connected to local filesystem
+make run-data
+list.files('/localdata/')
+q()
+
+#########################
+# Don't need to reinvent the wheel - DockerHub rocker
+#########################
+
+# Someone's done this before - look at rocker - different r versions
+https://hub.docker.com/u/rocker/
+
+# pull down the image and run
+docker pull rocker/r-ver:3.3.1
+docker run --rm -it rocker/r-ver:3.3.1
+rownames(installed.packages())
+q()
+
+#####################
+# This is where it gets really cool...
+#####################
+
+docker run -d -p 8787:8787 rocker/rstudio
+
+# What is this black magic?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.  
+# The image contains RStudio Server Community Edition so we can run R in here rather than using the terminal.
+
+# Look at the running container
+docker ps
+
+# use docker exec to open a bash session inside the container (as root)
+docker exec -it container-name bash
+
+# switch to the rstudio user and go to the home directory
+su rstudio
+cd ~
+
+# then create a file in RStudio
+# and view it in the shell
+ls
+
+######################
+# Summing up
+#####################
+
+# Why is all of this useful?
+# - easily use different versions of R
+# - codify difficult package installs
+# - have different environments for different projects
+# - host the same environment in different place - laptops of project team members, local compute cluster, AWS, Azure etc.
+# - most importantly - robustness: re-run code on the exact same environment when you return to a project
+
+
+# Self-auditing Docker images
+# - see blog post and git repo for details
+# - easier if you start from a rocker image (I needed centos)
+# - Makefiles also useful as they allow version control of docker build commands
+
+# Show end product ie NLP Docker container
+docker run -d -p 8787:8787 -p 3838:3838 --name='audit-demo' 053144277390.dkr.ecr.eu-west-2.amazonaws.com/chs-stage-13-rstan
+docker ps
+docker stop audit-demo
+docker rm audit-demo
+
