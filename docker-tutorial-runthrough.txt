@@ -39,8 +39,11 @@ docker exec -it test_centos bash
 # check that phil.txt is present
 ls
 
-# then exit, stop and remove the container
+# then exit, container is still running
 exit
+docker ps
+
+# stop and remove the container
 docker stop test_centos
 docker rm test_centos
 
@@ -78,6 +81,8 @@ docker run -it --rm --entrypoint R phil-r
 q()
 exit
 
+### first use case for Docker for R users: running different versions of R!
+
 # Would be nice to have some data:
 docker run -it --rm -v ~/Documents:/localdata phil-r
 ls
@@ -87,19 +92,23 @@ exit
 # Then install a package - lattice
 docker run -it --rm phil-r
 R
-install.package('lattice')
+install.packages('lattice')
 library(lattice)
 
 # Now try xml2
-install.package('xml2')
+install.packages('xml2')
 
-# fails because we're missing a system dep
+# fails because we're missing a system dep - install this
 q()
 apt-get update
 apt-get install libxml2-dev
+
+# now try again - success!
 R
 install.package('xml2')
 library(xml2)
+q()
+exit
 
 ######################
 # Dockerfiles
@@ -196,15 +205,27 @@ ls
 # - host the same environment in different place - laptops of project team members, local compute cluster, AWS, Azure etc.
 # - most importantly - robustness: re-run code on the exact same environment when you return to a project
 
+####################
+# Extras
+####################
 
 # Self-auditing Docker images
-# - see blog post and git repo for details
+# - see blog post and git repo for details:
+#   - https://chapmandu2.github.io/post/2018/05/26/reproducible-data-science-environments-with-docker/
 # - easier if you start from a rocker image (I needed centos)
-# - Makefiles also useful as they allow version control of docker build commands
+# - Makefiles useful as they allow version control of docker build commands
 
-# Show end product ie NLP Docker container
-docker run -d -p 8787:8787 -p 3838:3838 --name='audit-demo' 053144277390.dkr.ecr.eu-west-2.amazonaws.com/chs-stage-13-rstan
-docker ps
-docker stop audit-demo
-docker rm audit-demo
+# Show end product ie NLP Docker container (this bit won't)
+docker start rstan-demo
+open http://localhost:8787/ #rstudio
+open http://localhost:3838/users/rstudio/ #shiny
+
+# demo the following
+# - versioning and auditing
+# - shiny and rstudio server in one Docker image
+# - change the shiny app and immediately see changes
+# - great for analysis and publishing in same environment - since it's a Docker container can host it anywhere...
+
+docker stop rstan-demo
+
 
