@@ -1,4 +1,10 @@
 ####################
+# About this tutorial
+####################
+
+# This is a tutorial on using Docker aimed at R Users
+
+####################
 # Simple start with hello-world
 ####################
 
@@ -50,7 +56,9 @@ docker ps
 
 # stop and remove the container
 docker stop test_centos
+docker ps -a
 docker rm test_centos
+docker ps -a
 
 ######################
 # Make another centos image - a different instance but same container!
@@ -183,7 +191,7 @@ q()
 docker run -d -p 8787:8787 --name='rstudio-demo' rocker/rstudio
 open http://localhost:8787/
 
-# What is this?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.  
+# What is this?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.
 # The image serves RStudio Server Community Edition so we can run RStudio in a browser rather than using R on the terminal.
 
 # Look at the running container
