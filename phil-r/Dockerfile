@@ -6,5 +6,8 @@
 
 FROM rocker/r-ver:3.3.1
 
+# install Rcpp and BH
+RUN R -e "install.packages(c('Rcpp', 'BH'), Ncpus=parallel::detectCores())"
+
 # set command to run on startup
 CMD ["/bin/bash"]

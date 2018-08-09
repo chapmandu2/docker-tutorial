@@ -61,7 +61,7 @@ docker rm test_centos
 docker ps -a
 
 ######################
-# Make another centos image - a different instance but same container!
+# Make another centos container - a different instance but same image!
 ######################
 
 # make the container - use --rm parameter to automatically delete on exit
