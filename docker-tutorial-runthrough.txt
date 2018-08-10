@@ -4,6 +4,16 @@
 
 # This is a tutorial on using Docker aimed at R Users
 
+###################
+# Set up
+###################
+
+# install Docker from here - https://docs.docker.com/install/
+# Open the docker-tutorial.Rproj file in RStudio to open the project
+# build the phil-r image by executing the command below in RStudio 1.1 or later (ctrl-alt-return)
+cd phil-r; make build; cd ..
+# continue through the tutorial executing the commands with ctrl-alt-return
+
 ####################
 # Simple start with hello-world
 ####################
