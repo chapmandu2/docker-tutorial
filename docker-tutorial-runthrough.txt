@@ -123,7 +123,7 @@ install.packages('xml2', Ncpus=parallel::detectCores())
 # fails because we're missing a system dep - install this
 q()
 apt-get update
-apt-get install libxml2-dev
+apt-get install -y libxml2-dev
 
 # now try again - success!
 R
@@ -198,7 +198,7 @@ q()
 # This is where it gets really cool...
 #####################
 
-docker run -d -p 8787:8787 --name='rstudio-demo' rocker/rstudio
+docker run -d -p 8787:8787 -e PASSWORD=demo --name='rstudio-demo' rocker/verse:3.5.1
 open http://localhost:8787/
 
 # What is this?!  Now the container is run in detatched mode (-d) and we connect port 8787 on the host to port 8787 on the container.

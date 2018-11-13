@@ -8,7 +8,7 @@ FROM phil-r
 
 # install linux system deps
 RUN apt-get update && \
-	apt-get install libxml2-dev
+	apt-get install -y libxml2-dev
 
 # install xml2
 RUN R -e "install.packages('xml2', Ncpus=parallel::detectCores())"
